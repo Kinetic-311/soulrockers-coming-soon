@@ -101,11 +101,74 @@
     opacity: 0.7;
     margin: 0;
   }
+  .signup-form {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 4px;
+  }
+  .signup-form input[type="email"] {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: var(--fg);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .signup-form input[type="email"]::placeholder {
+    color: var(--muted);
+  }
+  .signup-form input[type="email"]:focus {
+    border-color: var(--accent);
+  }
+  .signup-form button {
+    padding: 12px 22px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .signup-form button:hover {
+    opacity: 0.85;
+  }
+  .signup-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .signup-note {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: -14px 0 0 0;
+    min-height: 1.2em;
+  }
+  .signup-note.error {
+    color: #d47070;
+  }
+  .signup-confirm {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--accent);
+    margin: 0;
+  }
   @media (max-width: 420px) {
     .countdown { gap: 10px; }
     .unit { min-width: 52px; }
     .unit .value { font-size: 1.6rem; }
     .wordmark { font-size: 1.35rem; letter-spacing: 0.25em; }
+    .signup-form { flex-direction: column; }
   }
 </style>
 </head>
@@ -122,7 +185,14 @@
     <div class="unit"><span class="value" id="seconds">00</span><span class="label">Seconds</span></div>
   </div>
   <p class="date-note">Launching September 3, 2026</p>
+
+  <form class="signup-form" id="signup-form">
+    <input type="email" id="signup-email" name="email" placeholder="Your email address" required autocomplete="email">
+    <button type="submit" id="signup-submit">Notify Me</button>
+  </form>
+  <p class="signup-note" id="signup-note"></p>
 </main>
+<p class="signup-confirm" id="signup-confirm" style="display:none;">Thanks — we'll be in touch.</p>
 <script>
   var LAUNCH = new Date("2026-09-03T00:00:00");
   function pad(n) { return String(n).padStart(2, "0"); }
@@ -147,6 +217,55 @@
   }
   tick();
   setInterval(tick, 1000);
+
+  // Formspree endpoint — set once the account is created (form: https://formspree.io/f/<id>).
+  // Left null on purpose: the form below refuses to submit and shows an honest
+  // "not yet configured" message instead of silently POSTing to a placeholder.
+  var FORMSPREE_ENDPOINT = null;
+
+  var form = document.getElementById("signup-form");
+  var emailInput = document.getElementById("signup-email");
+  var submitBtn = document.getElementById("signup-submit");
+  var note = document.getElementById("signup-note");
+  var confirm = document.getElementById("signup-confirm");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    note.textContent = "";
+    note.classList.remove("error");
+
+    if (!FORMSPREE_ENDPOINT) {
+      note.textContent = "Signups aren't connected yet — check back soon.";
+      note.classList.add("error");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+
+    fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      headers: { "Accept": "application/json" },
+      body: new FormData(form),
+    })
+      .then(function (res) {
+        if (res.ok) {
+          form.style.display = "none";
+          note.style.display = "none";
+          confirm.style.display = "block";
+        } else {
+          return res.json().then(function (data) {
+            throw new Error((data && data.errors && data.errors[0] && data.errors[0].message) || "Submission failed");
+          });
+        }
+      })
+      .catch(function (err) {
+        note.textContent = "Something went wrong — please try again.";
+        note.classList.add("error");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Notify Me";
+      });
+  });
 </script>
 </body>
 </html>
