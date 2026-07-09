@@ -218,10 +218,7 @@
   tick();
   setInterval(tick, 1000);
 
-  // Formspree endpoint — set once the account is created (form: https://formspree.io/f/<id>).
-  // Left null on purpose: the form below refuses to submit and shows an honest
-  // "not yet configured" message instead of silently POSTing to a placeholder.
-  var FORMSPREE_ENDPOINT = null;
+  var FORMSPREE_ENDPOINT = "https://formspree.io/f/mwvdgkkk";
 
   var form = document.getElementById("signup-form");
   var emailInput = document.getElementById("signup-email");
