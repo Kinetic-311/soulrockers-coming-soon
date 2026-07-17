@@ -164,33 +164,23 @@
     margin: 0;
   }
   .donate-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 50;
-    padding: 10px 26px;
-    background: transparent;
-    color: var(--accent);
+    padding: 12px 32px;
+    background: var(--accent);
+    color: var(--bg);
     border: 1px solid var(--accent);
     border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
+    box-shadow: 0 0 24px rgba(212, 175, 55, 0.35);
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
   .donate-btn:hover {
-    background: var(--accent);
-    color: var(--bg);
-  }
-  @media (max-width: 480px) {
-    .donate-btn {
-      top: 12px;
-      right: 12px;
-      padding: 8px 16px;
-      font-size: 0.7rem;
-    }
+    background: transparent;
+    color: var(--accent);
+    box-shadow: 0 0 32px rgba(212, 175, 55, 0.5);
   }
   .donate-overlay {
     position: fixed;
@@ -311,6 +301,7 @@
 </head>
 <body>
 <main>
+  <button type="button" class="donate-btn" id="donate-open">Donate</button>
   <img class="logo" src="assets/logo.png" alt="SoulRockers logo">
   <h1 class="wordmark">SoulRockers</h1>
   <p class="tagline">Bridging the ancient wisdom of the Earth with the future of conscious technology.</p>
@@ -328,8 +319,6 @@
     <button type="submit" id="signup-submit">Notify Me</button>
   </form>
   <p class="signup-note" id="signup-note"></p>
-
-  <button type="button" class="donate-btn" id="donate-open">Donate</button>
 </main>
 <p class="signup-confirm" id="signup-confirm" style="display:none;">Thanks — we'll be in touch.</p>
 
