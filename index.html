@@ -163,6 +163,132 @@
     color: var(--accent);
     margin: 0;
   }
+  .donate-btn {
+    margin-top: 4px;
+    padding: 10px 26px;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .donate-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .donate-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .donate-overlay.open { display: flex; }
+  .donate-modal {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: #0d1220;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+  .donate-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .donate-close:hover { color: var(--fg); }
+  .donate-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 4px 0;
+  }
+  .donate-title {
+    font-size: 1.3rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    margin: 0 0 16px 0;
+  }
+  .coin-select {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .coin-select button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.03);
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .coin-select button.active {
+    border-color: var(--accent);
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--accent);
+  }
+  .address-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .address-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin: 0 0 8px 0;
+  }
+  .address-value {
+    font-size: 0.72rem;
+    word-break: break-all;
+    line-height: 1.5;
+    margin: 0 0 12px 0;
+    color: var(--fg);
+  }
+  .copy-btn {
+    width: 100%;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .copy-btn:hover { background: var(--accent); color: var(--bg); }
+  .donate-footnote {
+    font-size: 0.65rem;
+    color: var(--muted);
+    opacity: 0.7;
+    margin: 14px 0 0 0;
+  }
   @media (max-width: 420px) {
     .countdown { gap: 10px; }
     .unit { min-width: 52px; }
@@ -191,8 +317,29 @@
     <button type="submit" id="signup-submit">Notify Me</button>
   </form>
   <p class="signup-note" id="signup-note"></p>
+
+  <button type="button" class="donate-btn" id="donate-open">Donate</button>
 </main>
 <p class="signup-confirm" id="signup-confirm" style="display:none;">Thanks — we'll be in touch.</p>
+
+<div class="donate-overlay" id="donate-overlay">
+  <div class="donate-modal">
+    <button class="donate-close" id="donate-close" aria-label="Close">✕</button>
+    <p class="donate-eyebrow">Support the Mission</p>
+    <h2 class="donate-title">DONATE</h2>
+    <div class="coin-select" id="coin-select">
+      <button type="button" class="active" data-coin="btc">BTC</button>
+      <button type="button" data-coin="eth">ETH</button>
+      <button type="button" data-coin="xmr">XMR</button>
+    </div>
+    <div class="address-box">
+      <p class="address-label" id="coin-label">Bitcoin Address</p>
+      <p class="address-value" id="coin-address"></p>
+      <button type="button" class="copy-btn" id="copy-btn">Copy Address</button>
+    </div>
+    <p class="donate-footnote">Direct wallet — 0% fees. Thank you for supporting the grid.</p>
+  </div>
+</div>
 <script>
   var LAUNCH = new Date("2026-09-03T00:00:00");
   function pad(n) { return String(n).padStart(2, "0"); }
@@ -262,6 +409,54 @@
         submitBtn.disabled = false;
         submitBtn.textContent = "Notify Me";
       });
+  });
+
+  var COINS = {
+    btc: { label: "Bitcoin", address: "bc1qx4wsqt2pq4xczgaa0ngd4ypc5mm7xg0yusepm7" },
+    eth: { label: "Ethereum", address: "0x6D59D120E22cDb9aaf4D2271AfC62795e7bDE0c1" },
+    xmr: { label: "Monero", address: "45r6hnqiguT5vUhgzNqJspKMMCSAUtwaVf2C65WoBRoVQpMZrWaceucQMKpVk8fZgGgSTT3NkEpT4isV2SBSjuUtN1MULhG" },
+  };
+
+  var donateOpenBtn = document.getElementById("donate-open");
+  var donateOverlay = document.getElementById("donate-overlay");
+  var donateCloseBtn = document.getElementById("donate-close");
+  var coinButtons = document.querySelectorAll("#coin-select button");
+  var coinLabel = document.getElementById("coin-label");
+  var coinAddress = document.getElementById("coin-address");
+  var copyBtn = document.getElementById("copy-btn");
+  var selectedCoin = "btc";
+
+  function renderCoin(id) {
+    selectedCoin = id;
+    coinLabel.textContent = COINS[id].label + " Address";
+    coinAddress.textContent = COINS[id].address;
+    copyBtn.textContent = "Copy Address";
+    coinButtons.forEach(function (btn) {
+      btn.classList.toggle("active", btn.dataset.coin === id);
+    });
+  }
+
+  donateOpenBtn.addEventListener("click", function () {
+    renderCoin(selectedCoin);
+    donateOverlay.classList.add("open");
+  });
+  donateCloseBtn.addEventListener("click", function () {
+    donateOverlay.classList.remove("open");
+  });
+  donateOverlay.addEventListener("click", function (e) {
+    if (e.target === donateOverlay) donateOverlay.classList.remove("open");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") donateOverlay.classList.remove("open");
+  });
+  coinButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () { renderCoin(btn.dataset.coin); });
+  });
+  copyBtn.addEventListener("click", function () {
+    navigator.clipboard.writeText(COINS[selectedCoin].address).then(function () {
+      copyBtn.textContent = "Copied!";
+      setTimeout(function () { copyBtn.textContent = "Copy Address"; }, 2000);
+    });
   });
 </script>
 </body>
