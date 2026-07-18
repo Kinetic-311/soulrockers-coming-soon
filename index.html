@@ -182,6 +182,16 @@
     color: var(--accent);
     box-shadow: 0 0 32px rgba(212, 175, 55, 0.5);
   }
+  #audio-toggle {
+    padding: 6px 14px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    font-size: 0.7rem;
+    cursor: pointer;
+  }
+  #audio-toggle:hover { color: var(--accent); border-color: var(--accent); }
   .donate-overlay {
     position: fixed;
     inset: 0;
@@ -302,6 +312,8 @@
 <body>
 <main>
   <button type="button" class="donate-btn" id="donate-open">Donate</button>
+  <audio id="bg-audio" src="assets/wake-up-mama.mp3" autoplay loop></audio>
+  <button type="button" id="audio-toggle" aria-label="Pause music">⏸ Pause music</button>
   <img class="logo" src="assets/logo.png" alt="SoulRockers logo">
   <h1 class="wordmark">SoulRockers</h1>
   <p class="tagline">Bridging the ancient wisdom of the Earth with the future of conscious technology.</p>
@@ -457,6 +469,22 @@
       copyBtn.textContent = "Copied!";
       setTimeout(function () { copyBtn.textContent = "Copy Address"; }, 2000);
     });
+  });
+
+  var bgAudio = document.getElementById("bg-audio");
+  var audioToggle = document.getElementById("audio-toggle");
+  bgAudio.play().catch(function () {
+    // Autoplay blocked by browser until user interacts with the page; reflect actual state.
+    audioToggle.textContent = "▶ Play music";
+  });
+  audioToggle.addEventListener("click", function () {
+    if (bgAudio.paused) {
+      bgAudio.play();
+      audioToggle.textContent = "⏸ Pause music";
+    } else {
+      bgAudio.pause();
+      audioToggle.textContent = "▶ Play music";
+    }
   });
 </script>
 </body>
