@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SoulRockers — Coming Soon</title>
-<meta name="description" content="SoulRockers launches September 3, 2026.">
+<meta name="description" content="SoulRockers is coming soon.">
 <style>
   :root {
     --bg: #05060a;
@@ -324,7 +324,7 @@
     <div class="unit"><span class="value" id="minutes">00</span><span class="label">Minutes</span></div>
     <div class="unit"><span class="value" id="seconds">00</span><span class="label">Seconds</span></div>
   </div>
-  <p class="date-note">Launching September 3, 2026</p>
+  <p class="date-note">Coming soon</p>
 
   <form class="signup-form" id="signup-form">
     <input type="email" id="signup-email" name="email" placeholder="Your email address" required autocomplete="email">
@@ -353,10 +353,14 @@
   </div>
 </div>
 <script>
-  var LAUNCH = new Date("2026-09-03T00:00:00");
+  // No launch date is announced; hide the countdown rather than show a stale one.
+  var cd = document.getElementById("countdown");
+  if (cd) cd.style.display = "none";
+  var LAUNCH = null;
   function pad(n) { return String(n).padStart(2, "0"); }
   function tick() {
     var now = new Date();
+    if (!LAUNCH) return;
     var diff = LAUNCH - now;
     if (diff <= 0) {
       document.getElementById("days").textContent = "00";
